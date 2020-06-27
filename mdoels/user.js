@@ -20,12 +20,13 @@ const userSchema = new mongoose.Schema({
     },
     salt: {
         type: String,
-        created: {
-            type: Date,
-            default: Date.now
-        },
-        updated: Date
-    }
+       
+    },
+    created: {
+        type: Date,
+        default: Date.now
+    },
+    updated: Date
 })
 
 //virtual field
@@ -41,11 +42,18 @@ userSchema.virtual("password")
 
 })
 .get(function() {
-    return this.password
+    return this._password
 })
 
 //methods
 userSchema.methods = {
+
+    authenticate: function(plaintText){
+
+        return this.encryptPassword(plaintText) == this.hashed_password
+
+    },
+
     encryptPassword: function(password){
         
         if(!password) return "";
