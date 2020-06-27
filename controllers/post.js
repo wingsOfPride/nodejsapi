@@ -1,6 +1,7 @@
 const Post = require('../mdoels/post')
 const formidable = require('formidable')
 const fs = require('fs')
+const _ = require('lodash')
 
 
 exports.postById = (req,res,next, id) => {
@@ -81,8 +82,10 @@ exports.postsByUser = (req,res) => {
 };
 
 exports.isPoster = (req,res,next) => {
-    console.log("REQUEST",  req.post,req.auth)
-    let isPoster = req.post && req.auth && req.post.postedBy._id === req.auth._id;
+    
+    let isPoster = req.post && req.auth && req.post.postedBy._id == req.auth._id;
+    console.log("POSTED",req.auth._id)
+
     if(!isPoster){
         return res.status(403).json({
             error: 'User is not authorized'
@@ -91,6 +94,21 @@ exports.isPoster = (req,res,next) => {
 
     next();
 
+}
+
+exports.updatePost = (req,res, next) => {
+    let post = req.post
+    post = _.extend(post, req.body)
+    post.updated = Date.now;
+    post.save((err) => {
+        if(err){
+            return res.status(400).json({
+                error: err
+            })
+        }
+        res.json(post)
+
+    })
 }
 
 exports.deletePost = (req, res, next) => {
